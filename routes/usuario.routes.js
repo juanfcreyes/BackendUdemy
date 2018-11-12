@@ -8,7 +8,10 @@ const userRoutes = express();
 * Obetener todo los usuarios
 */
 userRoutes.get('/', (req, res) => {
+	const desde = req.query.desde || 0;
 	Usuario.find({}, 'nombre email img role')
+	.skip(Number(desde))
+	.limit(5)
 	.exec((err, usuarios) => {
 		if (err) {
 			return res.status(500).json({
@@ -17,10 +20,21 @@ userRoutes.get('/', (req, res) => {
 				erros: err
 			});
 		}
-		res.status(200).json({
-			ok: true,
-			usuarios: usuarios
+		Usuario.count({}, (err, conteo) => {
+			if (err) {
+				return res.status(500).json({
+					ok: false,
+					mensaje: 'Error Cargando Usuarios',
+					erros: err
+				});
+			}
+			res.status(200).json({
+				ok: true,
+				total: conteo,
+				usuarios: usuarios
+			});
 		});
+		
 	})
 });
 

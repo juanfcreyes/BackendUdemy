@@ -10,21 +10,27 @@ const Usuario = require('../models/usuario');
 busquedaRoutes.get('/coleccion/:tabla/:busqueda', (req, res) => {
     const tabla = req.params.tabla;
     const busqueda = req.params.busqueda;
+    const paginar = req.query.paginar;
+    const desde = req.query.desde || 0;
     const regex = new RegExp(busqueda, 'i');
     let promesa = undefined;
 
     switch (tabla) {
-        case 'usuario':
-            promesa = buscarUsuarios(regex)
+        case 'usuarios':
+            if (paginar) {
+                promesa = buscarUsuariosPaginados(regex, desde);
+            } else {
+                promesa = buscarUsuarios(regex);
+            }
             break;
-        case 'medico':
-            promesa = buscarMedicos(regex)
+        case 'medicos':
+            promesa = buscarMedicos(regex);
             break;
-        case 'hospital':
-            promesa = buscarHospitales(regex) 
+        case 'hospitales':
+            promesa = buscarHospitales(regex);
             break;
         default:
-            res.status(400).json({
+            return res.status(400).json({
                 ok: false,
                 message: 'Coleccion no válida para la búsqueda'
             });
@@ -33,7 +39,8 @@ busquedaRoutes.get('/coleccion/:tabla/:busqueda', (req, res) => {
     promesa.then(respuesta => {
         res.status(200).json({
             ok: true,
-            [tabla]: respuesta
+            total: respuesta['total'] || respuesta.length,
+            [tabla]: respuesta[tabla] || respuesta 
         });
     })
 
@@ -88,7 +95,7 @@ function buscarMedicos(regex) {
 
 function buscarUsuarios(regex) {
     return new Promise((resolve, reject) => {
-        Usuario.find({}, 'nombre email role')
+        Usuario.find({}, 'nombre email role img google')
             .or([{ nombre: regex }, { email: regex }])
             .exec((err, usuarios) => {
                 if (err) {
@@ -97,6 +104,27 @@ function buscarUsuarios(regex) {
                     resolve(usuarios);
                 }
             });
+    });
+}
+
+function buscarUsuariosPaginados(regex, desde) {
+    return new Promise((resolve, reject) => {
+        Usuario.find({}, 'nombre email role img google')
+            .skip(Number(desde))
+	        .limit(5)
+            .or([{ nombre: regex }, { email: regex }])
+            .exec((err, usuarios) => {
+                if (err) {
+                    reject('Error al cargar usuarios', err);
+                } else {
+                    Usuario.countDocuments({}).or([{ nombre: regex }, { email: regex }])
+                    .exec((err, total) => {
+                        resolve( {usuarios, total });
+                    });
+                }
+            });
+
+            
     });
 }
 

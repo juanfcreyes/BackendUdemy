@@ -21,7 +21,7 @@ doctorRoutes.get('/', (req, res) => {
 				erros: err
 			});
         }
-        Medico.count({}, (err, conteo) => {
+        Medico.countDocuments({}, (err, conteo) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,

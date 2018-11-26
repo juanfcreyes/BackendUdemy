@@ -64,55 +64,54 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
     if (tipo === 'usuarios') {
         Usuario.findById(id, (err, usuario) => {
-            const pathAntiguo = './uploads/usuarios/' + usuario.img;
-            if (fs.existsSync(pathAntiguo)) {
-                fs.unlink(pathAntiguo);
-            }
+            eliminarPath(usuario.img, tipo);
             usuario.img = nombreArchivo;
-            usuario.save((err, usuarioActualizado) => {
-                return res.status(200).json({
-                    ok: true,
-                    mensaje: 'Imagen de usuario actualizada'
-                });
+            usuario.save(() => {
+                return responderPositivamente(nombreArchivo, res)
             });
         });
     }
 
     if (tipo === 'medicos') {
         Medico.findById(id, (err, medico) => {
-            const pathAntiguo = './uploads/medicos/' + medico.img;
-            if (fs.existsSync(pathAntiguo)) {
-                fs.unlink(pathAntiguo);
-            }
+            eliminarPath(medico.img, tipo);
             medico.img = nombreArchivo;
-            medico.save((err, medicoActualizado) => {
-                return res.status(200).json({
-                    ok: true,
-                    mensaje: 'Imagen de medico actualizada'
-                });
+            medico.save(() => {
+                return responderPositivamente(nombreArchivo, res)
             });
         });
     }
 
     if (tipo === 'hospitales') {
         Hospital.findById(id, (err, hospital) => {
-            const pathAntiguo = './uploads/hopitales/' + hospital.img;
-            if (fs.existsSync(pathAntiguo)) {
-                fs.unlink(pathAntiguo);
-            }
+            eliminarPath(hospital.img, tipo);
             hospital.img = nombreArchivo;
-            hospital.save((err, hospitalActualizado) => {
-                return res.status(200).json({
-                    ok: true,
-                    mensaje: 'Imagen de hospital actualizada'
-                });
+            hospital.save(() => {
+                return responderPositivamente(nombreArchivo, res)
             });
         });
-    }
-
-    
+    }    
 }
 
+
+function eliminarPath(img, tipo) {
+    const pathAntiguo = `./uploads/${tipo}/${img}`;
+    if (fs.existsSync(pathAntiguo)) {
+        fs.unlink(pathAntiguo);
+    }
+}
+
+function responderPositivamente(nombreArchivo, res) {
+    return res.status(200).json({
+        ok: true,
+        mensaje: 'Imagen actualizada',
+        img: nombreArchivo
+    });
+}
+
+
+
 module.exports = routes;
+
 
 

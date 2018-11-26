@@ -9,7 +9,7 @@ const userRoutes = express();
 */
 userRoutes.get('/', (req, res) => {
 	const desde = req.query.desde || 0;
-	Usuario.find({}, 'nombre email img role')
+	Usuario.find({}, 'nombre email img role google')
 	.skip(Number(desde))
 	.limit(5)
 	.exec((err, usuarios) => {
@@ -20,7 +20,7 @@ userRoutes.get('/', (req, res) => {
 				erros: err
 			});
 		}
-		Usuario.count({}, (err, conteo) => {
+		Usuario.countDocuments({}, (err, conteo) => {
 			if (err) {
 				return res.status(500).json({
 					ok: false,
@@ -89,7 +89,7 @@ userRoutes.put('/:id', middleware.verficarToken, (req, res) => {
 /**
 * Crear un nuevo usuario
 */
-userRoutes.post('/', middleware.verficarToken, (req, res) => {
+userRoutes.post('/', (req, res) => {
 	const body = req.body;
 	const usuario = new Usuario({
 		nombre: body.nombre,

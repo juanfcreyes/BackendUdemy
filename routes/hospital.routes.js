@@ -20,7 +20,7 @@ hospitalRoutes.get('/', (req, res) => {
 				erros: err
 			});
         }
-        Hospital.count({}, (err, conteo) => {
+        Hospital.countDocuments({}, (err, conteo) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,

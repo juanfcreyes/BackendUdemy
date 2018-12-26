@@ -10,10 +10,11 @@ const Usuario = require('../models/usuario');
 busquedaRoutes.get('/coleccion/:tabla/:busqueda', (req, res) => {
     const tabla = req.params.tabla;
     const busqueda = req.params.busqueda;
-    const paginar = req.query.paginar;
+    const paginar = req.query.paginar || false;
     const desde = req.query.desde || 0;
     const regex = new RegExp(busqueda, 'i');
     let promesa = undefined;
+
 
     switch (tabla) {
         case 'usuarios':

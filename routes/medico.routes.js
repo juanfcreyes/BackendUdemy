@@ -7,36 +7,69 @@ const doctorRoutes = express();
 * Obetener todos los medicos
 */
 doctorRoutes.get('/', (req, res) => {
-    const desde = req.query.desde || 0;
-    Medico.find({})
-    .populate('usuario', 'nombre email')
-    .populate('hospital')
-    .skip(Number(desde))
-	.limit(5)
-	.exec((err, medicos) => {
-		if (err) {
-			return res.status(500).json({
-				ok: false,
-				mensaje: 'Error cargando medicos',
-				erros: err
+	const desde = req.query.desde || 0;
+	Medico.find({})
+		.populate('usuario', 'nombre email')
+		.populate('hospital')
+		.skip(Number(desde))
+		.limit(5)
+		.exec((err, medicos) => {
+			if (err) {
+				return res.status(500).json({
+					ok: false,
+					mensaje: 'Error cargando medicos',
+					erros: err
+				});
+			}
+			Medico.countDocuments({}, (err, conteo) => {
+				if (err) {
+					return res.status(500).json({
+						ok: false,
+						mensaje: 'Error cargando medicos',
+						erros: err
+					});
+				}
+				res.status(200).json({
+					ok: true,
+					total: conteo,
+					medicos
+				});
 			});
-        }
-        Medico.countDocuments({}, (err, conteo) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    mensaje: 'Error cargando medicos',
-                    erros: err
-                });
-            }
-            res.status(200).json({
-                ok: true,
-                total: conteo,
-                medicos
-            }); 
-        });
-		
-	})
+
+		})
+});
+
+
+/**
+* Obetener medico by id
+*/
+doctorRoutes.get('/:id', (req, res) => {
+	const id = req.params.id;
+	Medico.findById(id)
+		.populate('usuario', 'nombre email img')
+		.populate('hospital')
+		.exec((err, medico) => {
+			if (err) {
+				return res.status(500).json({
+					ok: false,
+					mensaje: 'Error buscando medico',
+					erros: err
+				});
+			}
+
+			if (!medico) {
+				return res.status(400).json({
+					ok: false,
+					mensaje: 'No existe medico con ese id',
+					erros: {mesagge: 'No existe medico con ese id'}
+				});
+			}
+
+			res.status(200).json({
+				ok: true,
+				medico
+			});
+		})
 });
 
 /**
@@ -64,9 +97,9 @@ doctorRoutes.put('/:id', middleware.verficarToken, (req, res) => {
 			});
 		}
 
-        medico.nombre = body.nombre;
-        medico.usuario = req.usuario._id;
-        medico.hospital = body.hospital;
+		medico.nombre = body.nombre;
+		medico.usuario = req.usuario._id;
+		medico.hospital = body.hospital;
 		medico.save((err, medicoGuardado) => {
 			if (err) {
 				return res.status(400).json({
@@ -92,9 +125,9 @@ doctorRoutes.post('/', middleware.verficarToken, (req, res) => {
 	const body = req.body;
 	const medico = new Medico({
 		nombre: body.nombre,
-        img: body.img,
-        usuario: req.usuario._id,
-        hospital: body.hospital
+		img: body.img,
+		usuario: req.usuario._id,
+		hospital: body.hospital
 	});
 
 	medico.save((err, nuevoMedico) => {
@@ -118,12 +151,12 @@ doctorRoutes.post('/', middleware.verficarToken, (req, res) => {
 */
 doctorRoutes.delete('/:id', middleware.verficarToken, (req, res) => {
 	const id = req.params.id;
-	Medico.findByIdAndRemove( id, (err, medicoBorrado) => {
+	Medico.findByIdAndRemove(id, (err, medicoBorrado) => {
 		if (err) {
 			return res.status(500).json({
 				ok: false,
 				message: 'Error al borrar medico',
-				errors: err 
+				errors: err
 			});
 		}
 
@@ -131,7 +164,7 @@ doctorRoutes.delete('/:id', middleware.verficarToken, (req, res) => {
 			return res.status(400).json({
 				ok: false,
 				message: `No existe usaurio con ese id ${id}`,
-				errors: {message: `No existe usaurio con ese id ${id}`} 
+				errors: { message: `No existe usaurio con ese id ${id}` }
 			});
 		}
 

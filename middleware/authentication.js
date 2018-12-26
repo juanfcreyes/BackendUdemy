@@ -18,3 +18,40 @@ exports.verficarToken = function(req, res, next) {
 		next();
 	});
 }
+
+/**
+ * Verificar Admin
+ */
+exports.verficarAdmin = function(req, res, next) {
+	const usuario = req.usuario;
+	
+	if (usuario.role === 'ADMIN_ROLE') {
+		next();
+		return;
+	} else {
+		return res.status(403).json({
+			ok: false,
+			message: 'No es un usuario Administrador',
+			errors: {message: 'No puede realizar la acción requerida, no tiene los privilegios necesarios'}
+		});
+	}
+}
+
+/**
+ * Verificar admin o mismo usuario
+ */
+exports.verficarAdminUsuarioActual = function(req, res, next) {
+	const usuario = req.usuario;
+	const id = req.params.id;
+	if (usuario.role === 'ADMIN_ROLE' || usuario._id === id) {
+		next();
+		return;
+	} else {
+		return res.status(403).json({
+			ok: false,
+			message: 'No es un usuario Administrador',
+			errors: {message: 'No puede realizar la acción requerida, no tiene los privilegios necesarios'}
+		});
+	}
+
+}

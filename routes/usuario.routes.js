@@ -41,7 +41,7 @@ userRoutes.get('/', (req, res) => {
 /**
  * Actualizar usuario
  */
-userRoutes.put('/:id', middleware.verficarToken, (req, res) => {
+userRoutes.put('/:id', [middleware.verficarToken, middleware.verficarAdminUsuarioActual], (req, res) => {
 	const id = req.params.id;
 	const body = req.body;
 
@@ -50,16 +50,16 @@ userRoutes.put('/:id', middleware.verficarToken, (req, res) => {
 		if (err) {
 			return res.status(500).json({
 				ok: false,
-				mensaje: 'Error al buscar usuario',
-				erros: err
+				message: 'Error al buscar usuario',
+				errors: err
 			});
 		}
 
 		if (!usuario) {
 			return res.status(400).json({
 				ok: false,
-				mensaje: `El usuario con el id ${id} no existe`,
-				erros: { message: 'No existe el usaurio con ese Id' }
+				message: `El usuario con el id ${id} no existe`,
+				errors: { message: 'No existe el usaurio con ese Id' }
 			});
 		}
 
@@ -71,8 +71,8 @@ userRoutes.put('/:id', middleware.verficarToken, (req, res) => {
 			if (err) {
 				return res.status(400).json({
 					ok: false,
-					mensaje: 'Error al actualizar usuario',
-					erros: err
+					message: 'Error al actualizar usuario',
+					errors: err
 				});
 			}
 			usuarioGuardado.password = ':)';
@@ -103,8 +103,8 @@ userRoutes.post('/', (req, res) => {
 		if (err) {
 			return res.status(400).json({
 				ok: false,
-				mensaje: 'Error al Crear Usuario',
-				erros: err
+				message: 'Error al Crear Usuario',
+				errors: err
 			});
 		}
 		res.status(201).json({
@@ -118,7 +118,7 @@ userRoutes.post('/', (req, res) => {
 /**
 * Borrar un usuario
 */
-userRoutes.delete('/:id', middleware.verficarToken, (req, res) => {
+userRoutes.delete('/:id',  [middleware.verficarToken, middleware.verficarAdmin], (req, res) => {
 	const id = req.params.id;
 	Usuario.findByIdAndRemove( id, (err, usuarioBorrado) => {
 		if (err) {

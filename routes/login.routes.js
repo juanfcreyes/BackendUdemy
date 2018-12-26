@@ -25,12 +25,13 @@ function generarToken(usuario, res) {
          message: "Login post correcto",
          usuario,
          token,
-         id: usuario.id
+         id: usuario.id,
+         menu: obtenerMenu(usuario.role)
     });
 }
 
 /**
- * Responde con una estatus de error
+ * Responde con un estatus de error
  * @param {*} res 
  * @param {*} err 
  * @param {*} message 
@@ -125,5 +126,59 @@ loginRoutes.post('/', (req, res) => {
         return generarToken(usuario, res);
     });
 });
+
+function obtenerMenu(ROLE) {
+
+    const menu = [
+		{
+			titulo: 'Principal',
+			icono: 'mdi mdi-gauge',
+			submenu: [
+				{
+					titulo: 'Dashboard',
+					url: '/dashboard'
+				},
+				{
+					titulo: 'ProgressBar',
+					url: '/progress'
+				},
+				{
+					titulo: 'Graficas',
+					url: '/graficas'
+				},
+				{
+					titulo: 'Promesas',
+					url: '/promesas'
+				},
+				{
+					titulo: 'RXJS',
+					url: '/rxjs'
+				}
+			]
+		}, 
+		{
+			titulo: 'Mantenimientos',
+			icono: 'mdi mdi-folder-lock-open',
+			submenu: [
+				{
+					titulo: 'Hospitales',
+					url: '/hospitales'
+				},
+				{
+					titulo: 'Medicos',
+					url: '/medicos'
+				}
+			]
+		}
+    ];
+
+    if (ROLE === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift({
+            titulo: 'Usuarios',
+            url: '/usuarios'
+        });
+    }
+    return menu;
+}
 
 module.exports = loginRoutes;

@@ -35,7 +35,9 @@ const imagenesRoutes = require('./routes/imagenes.routes');
 
 // Conexion a la base de datos
 mongoose.connection.openUri('mongodb://localhost:27017/HospitalDB',
- (err, res) => {
+{ useNewUrlParser: true },
+ 
+(err, res) => {
     if (err) throw err;
     console.info('Base de datos: \x1b[32m%s\x1b[0m' , 'online');
 });

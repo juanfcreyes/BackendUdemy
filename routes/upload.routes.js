@@ -97,7 +97,7 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 function eliminarPath(img, tipo) {
     const pathAntiguo = `./uploads/${tipo}/${img}`;
     if (fs.existsSync(pathAntiguo)) {
-        fs.unlink(pathAntiguo);
+        fs.unlink(pathAntiguo, () => {});
     }
 }
 

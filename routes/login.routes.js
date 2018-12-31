@@ -9,6 +9,8 @@ const Usuario = require('../models/usuario');
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client(CLIENT_ID);
 
+const mdAutentication = require('../middleware/authentication')
+
 /**
  * Genera un token de un usuario autenticado
  * @param {*} usuario 
@@ -82,6 +84,19 @@ function guardarUsuarioGoogle(googleUser) {
         generarToken(usuarioNuevo, res);
     });
 }
+
+/**
+ * Renovacion de Token
+ */
+loginRoutes.get('/renuevatoken', mdAutentication.verficarToken , (req, res) => {
+    const token = jwt.sign({usuario: req.usuario}, 
+         SEED, {expiresIn: 14400});
+         
+    res.status(200).json({
+        ok: true,
+        token
+    });
+});
   
 /**
  * Autenticacion con google
